@@ -23,7 +23,7 @@ func NewService() *Service {
 	logger := logrus.New()
 
 	// init consumer
-	consumer := bitrix_consumer.NewService(logger, contact.HandleFunction)
+	consumer := bitrix_consumer.NewService(8081, logger, contact.HandleFunction)
 
 	return &Service{
 		Logger:  logger,

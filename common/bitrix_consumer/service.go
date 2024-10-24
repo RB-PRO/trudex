@@ -3,55 +3,36 @@ package bitrix_consumer
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type Service struct {
 	*gin.Engine
 	*logrus.Logger
+	handlerWorkFunc func(ctx context.Context) (string, error)
+	port            int
 }
 
 func NewService(
+	port int,
 	log *logrus.Logger,
-	handlerFunc func(ctx context.Context) (string, error),
+	handlerWorkFunc func(ctx context.Context) (string, error),
 ) *Service {
 	r := gin.Default()
+	r.Use(correlationID)
 
-	r.GET("/", func(c *gin.Context) {
-		ctx := c.Request.Context()
-		log.WithContext(ctx).Infof("request received in patch '%s'", c.FullPath())
+	service := &Service{
+		Engine:          r,
+		Logger:          log,
+		handlerWorkFunc: handlerWorkFunc,
+		port:            port,
+	}
 
-		result, err := handlerFunc(ctx)
-		if err != nil {
-			fmt.Print("$+$ err")
-		}
-		fmt.Print("$+$", result)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-
-	})
-	r.POST("/", func(c *gin.Context) {
-		ctx := c.Request.Context()
-		log.WithContext(ctx).Infof("request received in patch '%s'", c.FullPath())
-
-		result, err := handlerFunc(ctx)
-		if err != nil {
-			fmt.Print("$+$ err")
-		}
-		fmt.Print("$+$", result)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-
-	})
-	return &Service{Engine: r, Logger: log}
+	r.POST("/", service.handleConsumer)
+	return service
 }
 
 func (s *Service) RunConsumer() {
-	s.Info("start bitrix producer")
-	s.Run(":8081")
+	_ = s.Run(fmt.Sprintf(":%d", s.port))
 }
