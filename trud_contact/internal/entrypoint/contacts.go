@@ -3,13 +3,13 @@ package entrypoint
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"trudex/common/bitrix_consumer"
+	"trudex/common/bitrix_producer"
 	"trudex/trud_contact/internal/contact"
 )
 
 type Service struct {
 	*logrus.Logger
-	*bitrix_consumer.Service
+	*bitrix_producer.Service
 }
 
 func NewService() *Service {
@@ -23,7 +23,7 @@ func NewService() *Service {
 	logger := logrus.New()
 
 	// init consumer
-	consumer := bitrix_consumer.NewService(8081, logger, contact.HandleFunction)
+	consumer := bitrix_producer.NewService(8081, logger, contact.HandleFunction)
 
 	return &Service{
 		Logger:  logger,

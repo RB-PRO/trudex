@@ -5,6 +5,8 @@ GOBASE=$(shell pwd)
 GOPATH="$(GOBASE)/vendor:$(GOBASE)"
 GOBIN=$(GOBASE)/bin
 GOFILES=$(wildcard *.go)
+CLO_PORT=8081
+CLI_TOKEN=$(CLI_TOKEN)
 
 DOCKER_IMAGE_BASE=1.0
 
@@ -32,6 +34,14 @@ push-base:
 pull-base:
 	@echo "  >  Push base docker image"
 	@docker pull rbproxy/trudex_base:$(DOCKER_IMAGE_BASE)
+
+clo:
+	@clo publish http $(CLO_PORT)
+
+clo-install:
+	@wget https://cloudpub.ru/download/stable/clo-1.2.21-stable-linux-x86_64.tar.gz
+	@sudo dpkg -i cloudpub-1.1.21-stable-linux-x86_64.deb
+	@clo set token $(CLI_TOKEN)
 
 .PHONY: help
 all: help
