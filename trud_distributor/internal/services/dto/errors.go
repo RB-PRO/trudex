@@ -1,8 +1,8 @@
-package bitrix_producer
+package dto
 
 import (
 	"fmt"
-	corr_id "github.com/dmytrohridin/correlation-id"
+	correlationid "github.com/dmytrohridin/correlation-id"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -17,7 +17,7 @@ type response struct {
 func newResponse(c *gin.Context, status int, err error, formatError string, args ...string) response {
 	return response{
 		Status:    status,
-		RequestID: corr_id.FromContext(c.Request.Context()),
+		RequestID: correlationid.FromContext(c.Request.Context()),
 		Message:   fmt.Sprintf(formatError, args),
 		Error:     err,
 	}

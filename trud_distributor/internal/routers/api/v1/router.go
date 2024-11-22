@@ -1,23 +1,17 @@
-package bitrix_producer
+package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"trudex/trud_distributor/internal/routers/api/v1/middleware"
 )
 
-type Service struct {
-	*gin.Engine
-	*logrus.Logger
-	port int
-}
-
-func NewService(
+func NewEngine(
 	port int,
 	log *logrus.Logger,
 ) *Service {
 	r := gin.Default()
-	r.Use(correlationID())
+	r.Use(middleware.CorrelationID())
 
 	service := &Service{
 		Engine: r,
@@ -26,8 +20,4 @@ func NewService(
 	}
 	r.POST("/", service.handleProducer)
 	return service
-}
-
-func (s *Service) RunConsumer() {
-	_ = s.Run(fmt.Sprintf(":%d", s.port))
 }
