@@ -7,7 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"trudex/common/config"
 	"trudex/common/logger"
+	appconfig "trudex/trud_distributor/internal"
 	"trudex/trud_distributor/internal/routers"
 	"trudex/trud_distributor/internal/services"
 	"trudex/trud_distributor/internal/services/rabbitmq"
@@ -24,6 +26,12 @@ func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	}
 
 	// load config
+	ctx, err := config.AddConfigToCtx[appconfig.Config](ctx, cfgServer.ConfigPatch)
+	if err != nil {
+		return closer, errors.Wrap(err, "failed to load and add to context config")
+	}
+
+	// init logger
 	lg := logger.NewLogger()
 
 	rabbitmqService, stopFunc, err := rabbitmq.NewService()
@@ -37,7 +45,7 @@ func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	)
 
 	// initial router
-	srv := routers.InitRouter(lg, serviceList)
+	srv := routers.InitRouter(ctx, lg, serviceList)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)

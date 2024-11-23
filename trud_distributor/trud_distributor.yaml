@@ -1,0 +1,5 @@
+route:
+  port: 8080
+rabbitmq:
+  address: localhost
+  port: 8081

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	configPatch     = ""
+	configPatch     = "trud_distributor/trud_distributor.yaml"
 	shutdownTimeout = 5 * time.Second
 )
 

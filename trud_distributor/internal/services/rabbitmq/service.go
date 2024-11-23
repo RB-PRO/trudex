@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"context"
+	"trudex/common/config"
 )
 
 type ServiceInterface interface {
@@ -19,6 +20,9 @@ func NewService() (*Service, func(ctx context.Context) error, error) {
 }
 
 func (s *Service) Push(ctx context.Context, params ...interface{}) (bool, error) {
+
+	zzz := config.LoadFromContext(ctx)
+	_ = zzz
 
 	return false, nil
 }

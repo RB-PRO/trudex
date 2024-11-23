@@ -2,8 +2,12 @@ package bitrix
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
+	"log"
+	"net/url"
+	"trudex/common/config"
 	"trudex/trud_distributor/internal/services/dto"
 	"trudex/trud_distributor/internal/services/rabbitmq"
 )
@@ -16,7 +20,19 @@ func HandleBitrixConsumer(service *rabbitmq.Service) func(c *gin.Context) {
 			return
 		}
 
-		var data dto.BitrixWebhookData
+		z := config.LoadFromContext(c.Request.Context())
+		_ = z
+
+		fmt.Println("$+$")
+
+		// TODO: Add parser query
+		var data dto.Root
+		m, err := url.ParseQuery(string(body))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_ = m
 		if err := json.Unmarshal(body, &data); err != nil {
 			dto.NewInternalErr(c, err, "error unmarshal object body data '%s'", string(body))
 			return
