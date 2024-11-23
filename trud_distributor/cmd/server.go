@@ -3,6 +3,10 @@ package cmd
 import (
 	"context"
 	"github.com/pkg/errors"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"trudex/common/logger"
 	"trudex/trud_distributor/internal/routers"
 	"trudex/trud_distributor/internal/services"
@@ -33,12 +37,26 @@ func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	)
 
 	// initial router
-	engine := routers.InitRouter(lg, serviceList)
+	srv := routers.InitRouter(lg, serviceList)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			panic(err)
+		}
+	}()
 
-	// run router
-	if err := engine.Run(":8083"); err != nil {
-		return closer, errors.Wrap(err, "failed to start server")
-	}
+	closer.Add(func(ctx context.Context) error {
+		// Shutdown the server gracefully
+		if err := srv.Shutdown(ctx); err != nil {
+			return errors.Wrap(err, "server shutdown failed")
+		}
+
+		return nil
+	})
+
+	// Create a channel to listen for interrupt signals
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
 	return closer, nil
 }
@@ -52,8 +70,4 @@ func WithConfigPatch(configPatch string) ServerOption {
 	return func(h *ServerOpts) {
 		h.ConfigPatch = configPatch
 	}
-}
-
-func runRouter(ctx context.Context) {
-
 }
