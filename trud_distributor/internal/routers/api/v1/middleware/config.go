@@ -1,27 +1,17 @@
 package middleware
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
+	"trudex/common/config"
 	appconfig "trudex/trud_distributor/internal"
 )
 
-const (
-	ConfigCtxKey = "cfg"
-)
-
-// Config is middleware for add config id in context
-func Config(ctx context.Context) gin.HandlerFunc {
-
-	cfg, err := appconfig.LoadConfigFromContext(ctx)
-	if err != nil {
-		return func(c *gin.Context) {
-			c.Next()
-		}
-	}
+// Config is middleware for add config id in context and keys
+func Config(configService *config.Service[appconfig.Config]) gin.HandlerFunc {
+	cfg := configService.Config()
 
 	return func(c *gin.Context) {
-		c.Set(ConfigCtxKey, cfg)
+		c.Set(config.CtxKey, cfg)
 		c.Next()
 	}
 }

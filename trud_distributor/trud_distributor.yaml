@@ -1,5 +1,8 @@
 route:
   port: 8080
-rabbitmq:
-  address: localhost
-  port: 8081
+rabbit_config:
+  name: 'name'
+  consumers:
+    - name: 'name_1'
+      address: localhost
+      port: 8081

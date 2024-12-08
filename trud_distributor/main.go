@@ -11,7 +11,6 @@ import (
 )
 
 const (
-	configPatch     = "trud_distributor/trud_distributor.yaml"
 	shutdownTimeout = 5 * time.Second
 )
 
@@ -26,9 +25,8 @@ func main() {
 		}
 	}()
 
-	if closer, err := cmd.RunServer(ctx,
-		cmd.WithConfigPatch(configPatch),
-	); err != nil {
+	if closer, err := cmd.RunServer(ctx); err != nil {
+		log.Println("run server err:", err)
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
 

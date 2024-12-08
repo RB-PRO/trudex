@@ -7,7 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"trudex/common/config"
 	"trudex/common/logger"
+	"trudex/trud_distributor/internal"
 	"trudex/trud_distributor/internal/routers"
 	"trudex/trud_distributor/internal/services"
 	"trudex/trud_distributor/internal/services/rabbitmq"
@@ -24,25 +26,31 @@ import (
 //	return config.CfgToContext(ctx, patch), nil
 //}
 
-func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
+const (
+	defaultConfigPatch = "trud_distributor/trud_distributor.yaml"
+)
+
+func RunServer(ctx context.Context) (*Closer, error) {
 	// closer object for exit from application
 	closer := NewCloser()
 
-	// option for start application
-	cfgServer := &ServerOpts{}
-	for _, opt := range opts {
-		opt(cfgServer)
-	}
-
-	// load config
-	ctx, err := readConfigToCtx(ctx, cfgServer.ConfigPatch)
-	if err != nil {
-		return closer, errors.Wrap(err, "failed to load and add to context config")
-	}
-
-	// init logger
+	// initial logger
 	lg := logger.NewLogger()
 
+	// initial config service
+	configPatch := defaultConfigPatch
+	if customConfigPatch := os.Getenv("CUSTOM_CONFIG_PATCH"); customConfigPatch != "" {
+		configPatch = customConfigPatch
+	}
+
+	configService, err := config.New[internal.Config](
+		config.WithConfigPatch(configPatch),
+	)
+	if err != nil {
+		return closer, errors.Wrap(err, "failed to create config service")
+	}
+
+	// initial rabbitmq service
 	rabbitmqService, stopFunc, err := rabbitmq.NewService()
 	closer.Add(stopFunc)
 	if err != nil {
@@ -50,6 +58,7 @@ func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	}
 
 	serviceList := services.NewServices(
+		configService,
 		rabbitmqService,
 	)
 
@@ -76,15 +85,4 @@ func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	<-quit
 
 	return closer, nil
-}
-
-type ServerOpts struct {
-	ConfigPatch string
-}
-type ServerOption func(*ServerOpts)
-
-func WithConfigPatch(configPatch string) ServerOption {
-	return func(h *ServerOpts) {
-		h.ConfigPatch = configPatch
-	}
 }
