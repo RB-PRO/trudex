@@ -1,0 +1,5 @@
+port: 8080
+stars: [one,two,three]
+struct_param:
+  one_param: "one"
+  two_param: "two"

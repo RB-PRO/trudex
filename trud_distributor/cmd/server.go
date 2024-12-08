@@ -7,13 +7,22 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"trudex/common/config"
 	"trudex/common/logger"
-	appconfig "trudex/trud_distributor/internal"
 	"trudex/trud_distributor/internal/routers"
 	"trudex/trud_distributor/internal/services"
 	"trudex/trud_distributor/internal/services/rabbitmq"
 )
+
+//func readConfigToCtx(ctx context.Context, patch string) (context.Context, error) {
+//	cfgConfig, err := config.LoadConfig(patch)
+//	if err != nil {
+//		return ctx, err
+//	}
+//
+//	ctx, err = config.CfgToContext(ctx, cfgConfig)
+//
+//	return config.CfgToContext(ctx, patch), nil
+//}
 
 func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	// closer object for exit from application
@@ -26,7 +35,7 @@ func RunServer(ctx context.Context, opts ...ServerOption) (*Closer, error) {
 	}
 
 	// load config
-	ctx, err := config.AddConfigToCtx[appconfig.Config](ctx, cfgServer.ConfigPatch)
+	ctx, err := readConfigToCtx(ctx, cfgServer.ConfigPatch)
 	if err != nil {
 		return closer, errors.Wrap(err, "failed to load and add to context config")
 	}
