@@ -4,19 +4,21 @@ import (
 	"trudex/common/config"
 
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig(t *testing.T) {
-	const configFilePatch = "./test_config.yaml"
 
 	type TestConfig struct {
-		Port        string   `json:"port"`
-		Stars       []string `json:"stars"`
+		Port        string   `yaml:"port"`
+		Stars       []string `yaml:"stars"`
 		StructParam struct {
-			OneParam string `json:"one_param"`
-			TwoParam string `json:"two_param"`
-		} `json:"struct_param"`
+			OneParam string `yaml:"one_param"`
+			TwoParam string `yaml:"two_param"`
+		} `yaml:"struct_param"`
 	}
+
 	testData := `
 port: 8080
 stars: [one,two,three]
@@ -25,17 +27,21 @@ struct_param:
   two_param: "two"
 `
 
+	expectedData := TestConfig{
+		Port:  "8080",
+		Stars: []string{"one", "two", "three"},
+		StructParam: struct {
+			OneParam string `yaml:"one_param"`
+			TwoParam string `yaml:"two_param"`
+		}{OneParam: "one", TwoParam: "two"},
+	}
+
 	configService, err := config.New[TestConfig](
 		config.WithData(testData),
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if configService == nil {
-		t.Log(configService)
-		t.Fatal("configService in nil")
-	}
+	assert.NoError(t, err)
+	assert.Nil(t, configService)
 
-	z := configService.Config()
-	_ = z
+	cfg := configService.Config()
+	assert.Equal(t, expectedData, cfg)
 }
