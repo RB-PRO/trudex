@@ -1,0 +1,20 @@
+services:
+  distributor:
+    container_name: "trud-distributor"
+    build:
+      context: .
+      dockerfile: trud_distributor.Dockerfile
+    environment:
+      - CUSTOM_CONFIG_PATCH=/app/trud_distributor.prod.yaml
+    volumes:
+      - ./configs/trud_distributor/trud_distributor.prod.yaml:/app/trud_distributor.prod.yaml
+    ports:
+      - "8080:8080"
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:management-alpine
+    restart: always
+    network_mode: host
+    expose:
+      - 5672:5672
+      - 15672:15672

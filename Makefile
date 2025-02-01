@@ -20,20 +20,19 @@ go-clean:
 
 
 .PHONY: docker
-
 build: build-base push-base
 
 build-base:
 	@echo "  >  Build base docker image"
-	@docker build --file base.Dockerfile --tag rbproxy/trudex_base:$(DOCKER_IMAGE_BASE) --force-rm .
+	@docker build --file trud_base.Dockerfile --tag rbproxy/trud_base:$(DOCKER_IMAGE_BASE) --force-rm .
 
 push-base:
 	@echo "  >  Push base docker image"
-	@docker push rbproxy/trudex_base:$(DOCKER_IMAGE_BASE)
+	@docker push rbproxy/trud_base:$(DOCKER_IMAGE_BASE)
 
 pull-base:
 	@echo "  >  Push base docker image"
-	@docker pull rbproxy/trudex_base:$(DOCKER_IMAGE_BASE)
+	@docker pull rbproxy/trud_base:$(DOCKER_IMAGE_BASE)
 
 clo:
 	@clo publish http $(CLO_PORT)
@@ -42,6 +41,9 @@ clo-install:
 	@wget https://cloudpub.ru/download/stable/clo-1.2.21-stable-linux-x86_64.tar.gz
 	@sudo dpkg -i cloudpub-1.1.21-stable-linux-x86_64.deb
 	@clo set token $(CLI_TOKEN)
+
+build-start-compose:
+	@docker-compose up -d --build
 
 .PHONY: help
 all: help
