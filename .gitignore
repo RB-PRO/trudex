@@ -1,3 +1,9 @@
 .idea
 .env
 custom/
+
+# Optimization of the GIT do not half allow you to use ignoring for the entire folder, adding all Example to the exception, so we manually index
+configs/rabbitmq/definitions.json
+configs/rabbitmq/rabbitmq.conf
+
+configs/trud_distributor/trud_distributor.prod.yaml

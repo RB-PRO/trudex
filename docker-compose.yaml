@@ -13,8 +13,15 @@ services:
   rabbitmq:
     container_name: "rabbitmq"
     image: rabbitmq:management-alpine
+    ports:
+      - "15672:15672"
+    volumes:
+      - ./configs/rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/00-custom.conf  # the container initially defines the /etc/rabbitmq/conf.d/10-cust.conf, we immediately indicate the smaller file number, see: https://www.rabbitmq.com/docs/configure#config-confd-directory
+      - ./configs/rabbitmq/definitions.json:/etc/rabbitmq/definitions/definitions.json # definition of Definitions is indicated in 00-custom.conf for key definitions.local.path
+      - ./custom/rabbitmq_data:/var/lib/rabbitmq/
     restart: always
-    network_mode: host
-    expose:
-      - 5672:5672
-      - 15672:15672
+#volumes:
+#  rabbitmq_data:  # Определяем том для данных
+#
+#networks:
+#  rabbitmq_net:

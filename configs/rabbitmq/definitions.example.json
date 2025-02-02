@@ -1,0 +1,114 @@
+{
+  "permissions": [
+    {
+      "configure": ".*",
+      "read": ".*",
+      "user": "guest",
+      "vhost": "/",
+      "write": ".*"
+    }
+  ],
+  "bindings": [
+    {
+      "arguments": {
+
+      },
+      "destination": "service-1",
+      "destination_type": "queue",
+      "routing_key": "service-1-key",
+      "source": "trudex",
+      "vhost": "/"
+    },
+    {
+      "arguments": {
+
+      },
+      "destination": "service-2",
+      "destination_type": "queue",
+      "routing_key": "service-2-key",
+      "source": "trudex",
+      "vhost": "/"
+    }
+  ],
+  "queues": [
+    {
+      "arguments": {
+        "x-queue-type": "classic"
+      },
+      "auto_delete": false,
+      "durable": true,
+      "name": "service-2",
+      "type": "classic",
+      "vhost": "/"
+    },
+    {
+      "arguments": {
+        "x-queue-type": "classic"
+      },
+      "auto_delete": false,
+      "durable": true,
+      "name": "service-1",
+      "type": "classic",
+      "vhost": "/"
+    }
+  ],
+  "parameters": [
+
+  ],
+  "policies": [
+
+  ],
+  "rabbitmq_version": "4.0.5",
+  "rabbit_version": "4.0.5",
+  "exchanges": [
+    {
+      "arguments": {
+
+      },
+      "auto_delete": false,
+      "durable": true,
+      "name": "trudex",
+      "type": "direct",
+      "vhost": "/"
+    }
+  ],
+  "vhosts": [
+    {
+      "default_queue_type": "classic",
+      "limits": [
+
+      ],
+      "metadata": {
+        "description": "Default virtual host",
+        "tags": [
+
+        ]
+      },
+      "name": "/"
+    }
+  ],
+  "users": [
+    {
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "limits": {
+
+      },
+      "name": "guest",
+      "password_hash": "mddjXzU6aVYTZrsIbL2u1rjw2pD+DwpG7A8UBj9TUaeIWsrT",
+      "tags": [
+        "administrator"
+      ]
+    }
+  ],
+  "global_parameters": [
+    {
+      "name": "cluster_tags",
+      "value": [
+
+      ]
+    }
+  ],
+  "topic_permissions": [
+
+  ]
+}
