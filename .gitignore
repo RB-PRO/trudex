@@ -7,3 +7,6 @@ configs/rabbitmq/definitions.json
 configs/rabbitmq/rabbitmq.conf
 
 configs/trud_distributor/trud_distributor.prod.yaml
+
+# DRAWIO System File
+.$infrastructure_diagram.drawio.bkp
