@@ -1,7 +1,7 @@
 route:
   port: 8080
 rabbit_config:
-  name: 'name'
+  exchange_name: 'trudex'
   consumers:
     - name: 'name_1'
       address: localhost

@@ -2,12 +2,12 @@ package rabbitmq
 
 // RabbitConfig for establishing one connection
 type RabbitConfig struct {
-	Name      string     `yaml:"name"`
-	Consumers []Consumer `yaml:"consumers"`
+	ExchangeName     string     `yaml:"exchange_name"`
+	ApplicationToken string     `yaml:"application_token"`
+	Consumers        []Consumer `yaml:"consumers"`
 }
 
 type Consumer struct {
-	Name    string `yaml:"name"`
-	Address string `yaml:"address"`
-	Port    int    `yaml:"port"`
+	Name       string `yaml:"name"`
+	RoutingKey string `yaml:"routing_key"`
 }

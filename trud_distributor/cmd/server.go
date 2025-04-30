@@ -27,7 +27,7 @@ import (
 //}
 
 const (
-	defaultConfigPatch = "trud_distributor/trud_distributor.yaml"
+	defaultConfigPatch = "trud_distributor.prod.yaml"
 )
 
 func RunServer(ctx context.Context) (*Closer, error) {
@@ -39,7 +39,7 @@ func RunServer(ctx context.Context) (*Closer, error) {
 
 	// initial config service
 	configPatch := defaultConfigPatch
-	if customConfigPatch := os.Getenv("CUSTOM_CONFIG_PATCH"); customConfigPatch != "" {
+	if customConfigPatch := os.Getenv("CUSTOM_TRUD_DISTRIBUTOR_CONFIG_PATCH"); customConfigPatch != "" {
 		configPatch = customConfigPatch
 	}
 
@@ -51,7 +51,7 @@ func RunServer(ctx context.Context) (*Closer, error) {
 	}
 
 	// initial rabbitmq service
-	rabbitmqService, stopFunc, err := rabbitmq.NewService()
+	rabbitmqService, stopFunc, err := rabbitmq.NewService(configService.Config().RabbitConfig)
 	closer.Add(stopFunc)
 	if err != nil {
 		return closer, errors.Wrap(err, "failed to create rabbitmq service")

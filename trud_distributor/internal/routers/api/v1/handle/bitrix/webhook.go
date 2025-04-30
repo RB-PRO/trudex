@@ -1,50 +1,37 @@
 package bitrix
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"io"
-	"trudex/common/config"
-	"trudex/trud_distributor/internal"
 	"trudex/trud_distributor/internal/services/dto"
 	"trudex/trud_distributor/internal/services/rabbitmq"
+	"trudex/trud_distributor/pkg/body_parser"
 )
 
 func HandleBitrixConsumer(service *rabbitmq.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		body, err := io.ReadAll(c.Request.Body)
+		ctx := c.Request.Context()
+
+		bodyByte, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			dto.NewInternalErr(c, err, "error read body '%s'", string(body))
+			dto.NewInternalErr(c, err, "error read body '%s'", string(bodyByte))
 			return
 		}
 
-		ctx, _, err := config.LoadToCtxFromKeys[internal.Config](c.Request.Context(), c.Keys)
+		event, err := body_parser.ParseEventData(bodyByte)
 		if err != nil {
-			dto.NewInternalErr(c, err, "error load config")
-			return
+			dto.NewInternalErr(c, err, "error parse body '%s'", string(bodyByte))
 		}
 
-		//// TODO: Add parser query
-		//var data dto.Root
-		//m, err := url.ParseQuery(string(body))
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-		//
-		//_ = m
-		//if err := json.Unmarshal(body, &data); err != nil {
-		//	dto.NewInternalErr(c, err, "error unmarshal object body data '%s'", string(body))
-		//	return
-		//}
+		fmt.Printf("$+$ %+v\n", string(bodyByte))
+		fmt.Printf("$+$ %+v\n", event)
 
 		// service > put in rabbit mq
-		isSend, err := service.Push(ctx)
-		if err != nil {
+		if err := service.Push(ctx, event); err != nil {
 			// todo: handle error me
-			dto.NewInternalErr(c, err, "internal rabbit mq error")
-			return
-		}
-
-		if !isSend {
+			logrus.WithContext(ctx).Error(err)
 			dto.NewInternalErr(c, err, "internal rabbit mq error")
 			return
 		}
